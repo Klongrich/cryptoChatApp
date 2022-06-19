@@ -37,6 +37,8 @@ import { getUserInboxMessages}  from "../utils/inbox/getUserInboxMessages";
 import { burgerStyles } from "../static/burgerMenuStyles";
 import { FirebaseConfig } from "../static/firbaseConfig";
 
+import { SiweMessage } from 'siwe';
+
 import { HeaderBox,
         NewMessageBox,
         LogOutArrow,
@@ -59,6 +61,7 @@ import { GetUserTokenMeta } from "../utils/eth/getUserTokenMeta";
 
 //Test
 import { ExampleTest } from "../test/getUserTokenMetaExampleTest";
+import { sign } from 'crypto';
 
 // Initialize Firebase
 const app = initializeApp(FirebaseConfig);
@@ -145,13 +148,6 @@ function reducer(state: StateType, action: ActionType): StateType {
       throw new Error()
   }
 }
-interface MessageObject {
-  from : string;
-  message : string | undefined;
-  time : number | string | undefined;
-  alias: string;
-}
-
 
 const Home: NextPage = () => {
   const [loggedIn, setLoggedIn] = useState(false);
@@ -222,6 +218,41 @@ const Home: NextPage = () => {
   });
 }
 
+  async function SignInWithETH(web3Provider : any, statement: any) {
+    if (window.location) {
+      const signer = await web3Provider.getSigner();
+      const domain = window.location.host;
+      const origin = window.location.origin;
+
+      let address = await signer.getAddress();
+
+      const message = new SiweMessage({
+        domain,
+        address,
+        statement,
+        uri: origin,
+        version: '1',
+        chainId: 1
+      })
+
+      let Message = await message.prepareMessage();
+
+      if (message) {
+        let signature = await signer.signMessage(Message);
+        let CheckMessage = await new SiweMessage(message);
+
+        try {
+          let res = await CheckMessage.validate(signature);
+          if (res) {
+            return (true);
+          }
+        } catch (error) {
+          return (false);
+        }
+      }
+    }
+  }
+
   const connect = useCallback(async function () {
     // This is the initial `provider` that is returned when
     // using web3Modal to connect. Can be MetaMask or WalletConnect.
@@ -231,8 +262,16 @@ const Home: NextPage = () => {
     // a Web3Provider. This will add on methods from ethers.js and
     // event listeners such as `.on()` will be different.
     const web3Provider = new providers.Web3Provider(provider)
-
     const signer = web3Provider.getSigner()
+
+    let isSignedIn = await SignInWithETH(web3Provider, "Hello World");
+
+    if (isSignedIn) {
+      setLoggedIn(true);
+    } else {
+      setLoggedIn(false);
+    }
+
     const address = await (await signer.getAddress()).toLowerCase();
 
     //Call To check User Firestore here instead.
@@ -243,11 +282,6 @@ const Home: NextPage = () => {
 
     const network = await web3Provider.getNetwork();
 
-    //Fecthing recent transcations the users wallet has made
-    //Should be moved to Contacts, compnents as a "reccomened" or "recent"
-
-    //await GetUserTokenMeta("0xEf0ec25bF8931EcA46D2fF785d1A7f3d7Db6F7ab", setUserERC20, setUserERC721, setERC20IsLoaded, setERC721IsLoaded);
-
     dispatch({
       type: 'SET_WEB3_PROVIDER',
       provider,
@@ -255,9 +289,7 @@ const Home: NextPage = () => {
       address,
       chainId: network.chainId,
     })
-
-    setLoggedIn(true);
-  }, [loggedIn])
+  }, [])
 
   const disconnect = useCallback(
     async function () {
