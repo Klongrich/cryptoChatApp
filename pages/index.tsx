@@ -2,6 +2,7 @@ import type { NextPage } from 'next'
 import styled from 'styled-components';
 
 import Head from 'next/head'
+import Web3 from "web3";
 
 import styles from  "../styles/Home.module.css";
 
@@ -70,6 +71,8 @@ const auth = getAuth();
 signInAnonymously(auth);
 const database = getDatabase();
 
+
+
 // Initalize web3 provider options
 const providerOptions = {
   walletconnect: {
@@ -78,6 +81,12 @@ const providerOptions = {
           infuraId: process.env.INFURA_ID
       },
   },
+  binancechainwallet: {
+    package: true
+  },
+  opera: {
+    package: true
+  }
 };
 
 let web3Modal : any
@@ -252,6 +261,7 @@ const Home: NextPage = () => {
       }
     }
   }
+
 
   const connect = useCallback(async function () {
     // This is the initial `provider` that is returned when
