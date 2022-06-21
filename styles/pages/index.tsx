@@ -142,3 +142,26 @@ export const EditMessageBox = styled.div`
 export const ContainerBox = styled.div`
   width: 100%;
 `
+
+export const SolWelcomeBox = styled.div`
+  text-align: center;
+  font-family: san franscio;
+
+  h4 {
+    font-size: 23px;
+  }
+
+  h5 {
+    margin-top: -15px;
+    font-size: 12px;
+  }
+
+  p {
+    line-height: 1.8;
+  }
+
+
+  padding-left: 40px;
+  padding-right: 40px;
+
+`

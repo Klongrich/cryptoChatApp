@@ -49,10 +49,14 @@ import { HeaderBox,
         NewContactBackArrowBox,
         AddContactButton,
         EditMessageBox,
-        ContainerBox
+        ContainerBox,
+        SolWelcomeBox
 } from "../styles/pages";
 
 import { MetaBox } from "../components/MetaBox";
+
+import { Connection, PublicKey, clusterApiUrl } from "@solana/web3.js";
+
 
 //Used to get all ERC20 or E721 Token Meta of any address
 
@@ -71,7 +75,21 @@ const auth = getAuth();
 signInAnonymously(auth);
 const database = getDatabase();
 
+type PhantomEvent = "disconnect" | "connect" | "accountChanged";
 
+interface ConnectOpts {
+    onlyIfTrusted: boolean;
+}
+interface PhantomProvider {
+    connect: (opts?: Partial<ConnectOpts>) => Promise<{ publicKey: PublicKey }>;
+    disconnect: ()=>Promise<void>;
+    on: (event: PhantomEvent, callback: (args:any)=>void) => void;
+    isPhantom: boolean;
+}
+
+type WindowWithSolana = Window & {
+    solana?: PhantomProvider;
+}
 
 // Initalize web3 provider options
 const providerOptions = {
@@ -158,6 +176,8 @@ function reducer(state: StateType, action: ActionType): StateType {
   }
 }
 
+
+
 const Home: NextPage = () => {
   const [loggedIn, setLoggedIn] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
@@ -181,8 +201,9 @@ const Home: NextPage = () => {
 
   const [displayUserMeta, setDisplayUserMeta] = useState(false);
 
-  //Hot fix for rendering shit in typescript / next
-  const [txsData, setTxsData] = useState([{blocknumber : "", address: ""}]);
+  const [ solProvider, setSolProvider ] = useState<PhantomProvider | null>(null);
+  const [ pubKey, setPubKey ] = useState<string | null>(null);
+  const [isSolana, setIsSolana] = useState(false);
 
   const [userInboxMessages, setUserInboxMessages] = useState([{from : "", message : "", time : 0, alias : ""}])
 
@@ -322,7 +343,6 @@ const Home: NextPage = () => {
     }
   }, [connect])
 
-
   // A `provider` should come with EIP-1193 events. We'll listen for those events
   // here so that when a user switches accounts or networks, we can update the
   // local React state with that new information.
@@ -439,6 +459,47 @@ const Home: NextPage = () => {
     }
   }
 
+  useEffect( ()=>{
+    if ("solana" in window) {
+      const solWindow = window as WindowWithSolana;
+      if (solWindow?.solana?.isPhantom) {
+          setSolProvider(solWindow.solana);
+          solWindow.solana.connect({ onlyIfTrusted: true });
+      }
+    }
+  }, []);
+
+  async function updateToSolUser() {
+    solProvider?.on("connect", (pubKey: PublicKey) => {
+      let publicKey = pubKey?.toBase58();
+
+      if (publicKey != null) {
+        setPubKey(publicKey)
+
+        if (publicKey) {
+          listenForInbox(publicKey);
+        }
+
+        setIsSolana(true);
+        setLoggedIn(true);
+      }
+    });
+
+    await solProvider?.connect()
+    .catch((err : any) => { console.error("connect ERROR:", err); });
+  }
+
+  async function disConnectSolUser() {
+    solProvider?.on("disconnect", () => {
+      setPubKey(null);
+      setLoggedIn(false);
+      setIsSolana(false);
+    });
+
+    solProvider?.disconnect()
+    .catch((err : any) => {console.error("disconnect ERROR:", err); });
+  }
+
   return (<> <ContainerBox>
       <Head>
         <title>Crypto Chat</title>
@@ -451,8 +512,15 @@ const Home: NextPage = () => {
           <h2> Welcom to Crypto Chat! </h2>
           <h3> Connect your web3 wallet to sign in </h3>
           <button type="button" onClick={() => connect()}>
-            Connect
+            Connect with Etheruem
           </button>
+
+          <br /> <br />
+
+          <button onClick={() => updateToSolUser()}>
+            Connect with Solana
+          </button>
+
           <h4> Logged Out </h4>
         </div>
       </>}
@@ -476,7 +544,13 @@ const Home: NextPage = () => {
           {!chatRoom && <>
             <HeaderBox>
               <LogOutArrow>
-                <ArrowBack size={30} color="white" onClick={() => disconnect()} />
+                {isSolana && <>
+                  <ArrowBack size={30} color="white" onClick={() => disConnectSolUser()} />
+                </>}
+
+                {!isSolana && <>
+                  <ArrowBack size={30} color="white" onClick={() => disconnect()} />
+                </>}
               </LogOutArrow>
               <h2>Messages</h2>
               <ul>
@@ -485,6 +559,17 @@ const Home: NextPage = () => {
                 <li onClick={() => updatePageState("Meta")}> Meta </li>
                 <li onClick={() => setNewMessage(true)}>+</li>
               </ul>
+
+              {isSolana && <>
+                <SolWelcomeBox>
+                  <h4> Account ID </h4>
+                  {/* <h5> {pubKey?.substring(0,5) + "....." + pubKey?.substring(pubKey.length, pubKey.length - 5)} </h5> */}
+
+                  <h5>{pubKey} </h5> <br />
+                  <p> CryptoChat is currently intergrating decentralized messaging within the SOL network. </p>
+                  <p> Check back for more updates! </p>
+                </SolWelcomeBox>
+              </>}
             </HeaderBox>
 
             {!showContacts && !displayUserMeta && <>
