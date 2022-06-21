@@ -144,7 +144,7 @@ export async function getUserInboxMessages(userAddress : string, db : any) {
         }
 
     } else {
-        console.log("No such document!");
+        //console.log("No such document!");
     }
 
     let res = await userMessages.sort((t1 : any, t2 : any) => t2.time - t1.time);
