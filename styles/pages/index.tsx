@@ -141,6 +141,8 @@ export const EditMessageBox = styled.div`
 
 export const ContainerBox = styled.div`
   width: 100%;
+  background-color: black;
+  height: ${props => props.color};
 `
 
 export const SolWelcomeBox = styled.div`

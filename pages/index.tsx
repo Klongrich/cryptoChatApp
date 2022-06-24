@@ -181,7 +181,7 @@ function reducer(state: StateType, action: ActionType): StateType {
 const Home: NextPage = () => {
   const [loggedIn, setLoggedIn] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
-  
+
   const [state, dispatch] = useReducer(reducer, initialState)
   const { provider, web3Provider, address, chainId } = state
 
@@ -206,6 +206,8 @@ const Home: NextPage = () => {
   const [isSolana, setIsSolana] = useState(false);
 
   const [userInboxMessages, setUserInboxMessages] = useState([{from : "", message : "", time : 0, alias : ""}])
+
+  const [windowHeight, setWindowHeight] = useState("1000px");
 
   const [userERC721, setUserERC721] = useState([{
     tokenName : "",
@@ -500,7 +502,14 @@ const Home: NextPage = () => {
     .catch((err : any) => {console.error("disconnect ERROR:", err); });
   }
 
-  return (<> <ContainerBox>
+  useEffect(() => {
+    let wh = window.innerHeight + "px";
+    setWindowHeight(wh);
+  }, [windowHeight])
+
+  return (<>
+
+  <ContainerBox color={windowHeight}>
       <Head>
         <title>Crypto Chat</title>
         <meta name="description" content="Next Generation Chat App!" />
@@ -616,7 +625,8 @@ const Home: NextPage = () => {
                       fromAddress={chatFromAddress}
                       database={database}
                       db={db}
-                      toAlias={toAlias} />
+                      toAlias={toAlias}
+                      windowHeight={windowHeight} />
             </>}
 
             {/* Update To Chat Room */}

@@ -21,7 +21,7 @@ export const ChatRoomContainer = styled.div`
     padding-top: 20px;
     padding-bottom: 20px;
 
-    height: 490px;
+    height: ${props => props.color};
 
     transform: rotate(180deg) scaleX(-1);
 
@@ -152,7 +152,7 @@ export const InputBoxContainerMobile = styled.div`
     padding-top: 20px;
     color: white;
     text-align: center;
-    height: 200px;
+    height: 10px;
 `
 
 export const InputBoxContainerDesktop= styled.div`
@@ -170,7 +170,7 @@ export const SendPlaneContainerMobile = styled.div`
     padding-top: 5px;
     margin-top: -81px;
     background-color: black;
-    height: 100%;
+    height: 0px;
 `
 
 export const SendPlaneContainerDesktop = styled.div`

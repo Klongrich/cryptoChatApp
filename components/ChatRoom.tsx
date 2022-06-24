@@ -18,12 +18,13 @@ import { ChatRoomBox,
         SendPlaneContainerDesktop,
         SendPlaneContainerMobile } from "../styles/ChatRoom";
 
-export const ChatRoom = ({fromAddress, toAddress, toAlias, database} : any ) => {
+export const ChatRoom = ({fromAddress, toAddress, toAlias, database, windowHeight} : any ) => {
 
     const [chatMessages, setChatMessages] = useState([{from: "", message: "", time: ""}]);
     const [message, setMessage] = useState("");
 
     const [isMobile, setIsMobile] = useState(false);
+    const [chatHeight, setChatHeight] = useState("490px");
 
     function cutUserAddress(address : string) {
         if (address.includes("0x")) {
@@ -68,14 +69,26 @@ export const ChatRoom = ({fromAddress, toAddress, toAlias, database} : any ) => 
         }
     }
 
+    async function setChatRoomHeight() {
+        if(windowHeight) {
+            let _height = parseInt(windowHeight.substring(0,3));
+            let ChatHeight = _height - 169;
+            let StringToPass = ChatHeight + "px";
+
+            console.log("windowHeight: " + StringToPass);
+            setChatHeight(StringToPass);
+        }
+    }
+
     useEffect(() => {
+        setChatRoomHeight();
         getMessages();
         if (window.innerWidth < 999) {
             setIsMobile(true);
         } else {
             setIsMobile(false);
         }
-    }, [])
+    }, [windowHeight])
 
     return (
         <>
@@ -130,7 +143,7 @@ export const ChatRoom = ({fromAddress, toAddress, toAlias, database} : any ) => 
             </>}
 
             {isMobile && <>
-                <ChatRoomContainer>
+                <ChatRoomContainer color={chatHeight}>
                 {chatMessages.map((data) =>
                     <>
                         {data.time != null && <>
