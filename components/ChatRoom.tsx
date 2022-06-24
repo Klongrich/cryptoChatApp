@@ -91,7 +91,7 @@ export const ChatRoom = ({fromAddress, toAddress, toAlias, database, windowHeigh
         } else {
             setIsMobile(false);
         }
-    }, [windowHeight])
+    }, [chatHeight])
 
     return (
         <>
