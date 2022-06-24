@@ -42,6 +42,7 @@ export const ChatRoom = ({fromAddress, toAddress, toAlias, database, windowHeigh
              console.log("from Address: " + fromAddress);
               const listining = ref(database, 'messages/' + fromAddress.toLowerCase() + '/unread/' + toAddress.toLowerCase());
               onValue(listining, (snapshot) => {
+                  console.log(snapshot.val());
                 getMessages();
             });
           }
@@ -54,6 +55,7 @@ export const ChatRoom = ({fromAddress, toAddress, toAlias, database, windowHeigh
             console.log("to address: " + toAddress);
             const listining = ref(database, 'messages/' + toAddress.toLowerCase() + '/unread/' + fromAddress.toLowerCase());
             onValue(listining, (snapshot) => {
+                console.log(snapshot.val());
                 getMessages();
             });
         }
