@@ -1,4 +1,4 @@
-import { __SendMessage } from "./sendMessage";
+import { SendMessage } from "./sendMessage";
 import { doc, setDoc, getDoc } from "firebase/firestore/lite";
 
 import { checkRecivingInbox } from "../utils/inbox/checkRecivingInbox";
@@ -24,7 +24,7 @@ export async function SendNewMessage(
         for (let e = 0; e < 11; e++) {
             if (docData[e]){
                 if (docData[e] == toAddress) {
-                    await __SendMessage(userAddress, toAddress, message, updateToChatRoom, setNewMessage, setMessage);
+                    await SendMessage(userAddress, toAddress, message, updateToChatRoom, setNewMessage, setMessage);
                     return ;
                 }
                 if (docData[e] == "Free") {
@@ -38,7 +38,7 @@ export async function SendNewMessage(
                 }
                 await setDoc(docRef, docData);
                 await checkRecivingInbox(toAddress, userAddress, db);
-                await __SendMessage(userAddress, toAddress, message, updateToChatRoom, setNewMessage, setMessage);
+                await SendMessage(userAddress, toAddress, message, updateToChatRoom, setNewMessage, setMessage);
                 return ;
             }
         }
@@ -49,6 +49,6 @@ export async function SendNewMessage(
         }
         await setDoc(docRef, _data);
         await checkRecivingInbox(toAddress, userAddress, db);
-        await __SendMessage(userAddress, toAddress, message, updateToChatRoom, setNewMessage, setMessage);
+        await SendMessage(userAddress, toAddress, message, updateToChatRoom, setNewMessage, setMessage);
     }
 }

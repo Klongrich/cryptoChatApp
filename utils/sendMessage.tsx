@@ -6,7 +6,7 @@ import { updateCurrentMessageFrom } from "./updateCurrentMessageFrom";
 import { updateInboxTo } from "../utils/inbox/updateInboxTo";
 import { updateInboxFrom } from "../utils/inbox/updateInboxFrom";
 
-export async function __SendMessage(
+export async function SendMessage(
     fromAddress : any,
     toAddress : any,
     message : any,
