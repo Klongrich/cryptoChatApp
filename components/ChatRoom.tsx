@@ -57,6 +57,7 @@ export const ChatRoom = ({fromAddress, toAddress, toAlias, database, windowHeigh
     }, [])
 
     async function getMessages() {
+        console.log("Hello World");
         let AllMessages = await GetAllChatMessages(toAddress, fromAddress);
         //@ts-ignore
         setChatMessages(AllMessages);
