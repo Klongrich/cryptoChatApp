@@ -38,6 +38,7 @@ export const ChatRoom = ({fromAddress, toAddress, toAlias, database, windowHeigh
 
     useEffect(() => {
         async function ListenForFrom() {
+             console.log("---Listen For----")
               const listining = ref(database, 'messages/' + fromAddress.toLowerCase() + '/unread/' + toAddress.toLowerCase());
               onValue(listining, (snapshot) => {
                 getMessages();
@@ -48,6 +49,7 @@ export const ChatRoom = ({fromAddress, toAddress, toAlias, database, windowHeigh
 
     useEffect(() => {
         async function ListenForTo() {
+            console.log("---Listeing To---")
             const listining = ref(database, 'messages/' + toAddress.toLowerCase() + '/unread/' + fromAddress.toLowerCase());
             onValue(listining, (snapshot) => {
                 getMessages();
