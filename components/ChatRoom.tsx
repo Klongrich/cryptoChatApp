@@ -4,7 +4,7 @@ import { ref, onValue } from "firebase/database";
 import { GetAllChatMessages } from "../utils/chatbox/GetAllChatMessages";
 
 import { SendPlane } from "@styled-icons/remix-fill/SendPlane";
-import { SendMessage } from "../utils/sendMessage";
+import { __SendMessage } from "../utils/sendMessage";
 
 import { ChatRoomBox,
         ChatRoomContainer,
@@ -67,7 +67,7 @@ export const ChatRoom = ({fromAddress, toAddress, toAlias, database, windowHeigh
 
     function checkKey(key : any) {
         if (key === "Enter") {
-            SendMessage(fromAddress, toAddress, message, null, null, setMessage);
+            __SendMessage(fromAddress, toAddress, message, null, null, setMessage);
             setMessage("");
         }
     }
@@ -133,7 +133,7 @@ export const ChatRoom = ({fromAddress, toAddress, toAlias, database, windowHeigh
                 <br /> <br /> <br />
 
                 <SendPlaneContainerDesktop>
-                    <SendPlane size={42} color="white" onClick={() => SendMessage(
+                    <SendPlane size={42} color="white" onClick={() => __SendMessage(
                         fromAddress,
                         toAddress,
                         message,
@@ -173,7 +173,7 @@ export const ChatRoom = ({fromAddress, toAddress, toAlias, database, windowHeigh
                 <br /> <br /> <br />
 
                 <SendPlaneContainerMobile>
-                    <SendPlane size={30} color="white" onClick={() => SendMessage(
+                    <SendPlane size={30} color="white" onClick={() => __SendMessage(
                         fromAddress,
                         toAddress,
                         message,
